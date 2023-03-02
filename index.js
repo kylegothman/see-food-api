@@ -36,71 +36,68 @@ app.get('/profile/:id', (req, res) => {
     .catch(err => res.status(400).json('user not found'))
 })
 
-
-// PUT - UPDATE RANKING
-app.put('/image-ranking', (req, res) => {
-	const { id } = req.body;
-
-	db('users').where('id', '=', id)
-  	.increment('score', 1)
-  	.returning('score')
-  	.then(score => {
-    res.json(score[0].score);
-  })
-  .catch(err => res.status(400).json('unable to get score'))
-})
+// IMAGE RANKING
+app.put('/image-ranking', async (req, res) => {
+	try {
+		const { id } = req.body;
+		const updatedScore = await db('users')
+			.where('id', '=', id)
+			.increment('score', 1)
+			.returning('score');
+		res.json(updatedScore[0].score);
+	} catch (error) {
+		res.status(400).json('Unable to get score');
+	}
+});
 
 
 // POST REGISTER
-app.post('/register', (req, res) => {
-	const { name, username, password } = req.body.data;
-	const hash = bcrypt.hashSync(password);
-	  db.transaction(trx => {
-		trx.insert({
-		  hash: hash,
-		  username: username
-		})
-		.into('login')
-		.returning('username')
-		.then(loginUsername => {
-		  return trx('users')
-			.returning('*')
-			.insert({
-			  username: loginUsername[0].username,
-			  name: name,
-			  joined: new Date()
-			})
-			.then(user => {
-			  res.json(user[0]);
-			})
-		})
-		.then(trx.commit)
-		.catch(trx.rollback)
-	  })
-	  .catch(err => res.status(400).json('unable to register'))
-  })
-  
+app.post('/register', async (req, res) => {
+	try {
+		const { name, username, password } = req.body.data;
+		const hash = bcrypt.hashSync(password);
+		const insertedUsername = await db.transaction(async (trx) => {
+			const loginUsername = await trx('login')
+				.insert({
+					hash: hash,
+					username: username,
+				})
+				.returning('username');
+			const user = await trx('users')
+				.insert({
+					username: loginUsername[0],
+					name: name,
+					joined: new Date(),
+				})
+				.returning('*');
+			return user[0].username;
+		});
+		res.json(insertedUsername);
+	} catch (error) {
+		res.status(400).json('Unable to register');
+	}
+});
 
 
 //POST SIGNIN
-app.post('/signin', (req, res) => {
-  db.select('username', 'hash').from('login')
-    .where('username', '=', req.body.data.username)
-    .then(data => {
-      const isValid = bcrypt.compareSync(req.body.data.password, data[0].hash);
-      if (isValid) {
-        return db.select('*').from('users')
-          .where('username', '=', req.body.data.username)
-          .then(user => {
-            res.json(user[0])
-          })
-          .catch(err => res.status(400).json('unable to get user'))
-      } else {
-        res.status(400).json('wrong credentials')
-      }
-    })
-    .catch(err => res.status(400).json('wrong credentials'))
-})
+app.post('/signin', async (req, res) => {
+	try {
+		const { username, password } = req.body.data;
+		const userData = await db.select('username', 'hash').from('login').where('username', '=', username);
+		const isValid = bcrypt.compareSync(password, userData[0].hash);
+		if (isValid) {
+			const user = await db.select('*').from('users').where('username', '=', username);
+			res.json(user[0]);
+		} else {
+			res.status(400).json('Wrong credentials');
+		}
+	} catch (error) {
+		res.status(400).json('Wrong credentials');
+	}
+});
+
+
+
 
 
 app.listen(
