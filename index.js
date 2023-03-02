@@ -36,7 +36,7 @@ app.get('/profile/:id', (req, res) => {
     .catch(err => res.status(400).json('user not found'))
 })
 
-// IMAGE RANKING
+// IMAGE RANKINGs
 app.put('/image-ranking', async (req, res) => {
 	try {
 		const { id } = req.body;
@@ -79,24 +79,26 @@ app.post('/register', async (req, res) => {
 });
 
 
-//POST SIGNIN
-app.post('/signin', async (req, res) => {
-	try {
-		const { username, password } = req.body.data;
-		const userData = await db.select('username', 'hash').from('login').where('username', '=', username);
-		const isValid = bcrypt.compareSync(password, userData[0].hash);
-		if (isValid) {
-			const user = await db.select('*').from('users').where('username', '=', username);
-			res.json(user[0]);
+// POST SIGNIN
+app.post('/signin', (req, res) => {
+	const { username, password } = req.body.data;
+	db.select('username', 'hash').from('login')
+	  .where('username', '=', username)
+	  .then(data => {
+		const isValidPassword = bcrypt.compareSync(password, data[0].hash);
+		if (isValidPassword) {
+		  return db.select('*').from('users')
+			.where('username', '=', username)
+			.then(user => {
+			  res.json(user[0])
+			})
+			.catch(err => res.status(400).json('unable to get user'))
 		} else {
-			res.status(400).json('Wrong credentials');
+		  res.status(400).json('wrong credentials')
 		}
-	} catch (error) {
-		res.status(400).json('Wrong credentials');
-	}
-});
-
-
+	  })
+	  .catch(err => res.status(400).json('wrong credentials'))
+  })
 
 
 
