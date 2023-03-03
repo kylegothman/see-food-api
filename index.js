@@ -65,7 +65,7 @@ app.post('/register', async (req, res) => {
 				.returning('username');
 			const user = await trx('users')
 				.insert({
-					username: loginUsername[0],
+					username: loginUsername[0].username,
 					name: name,
 					joined: new Date(),
 				})
@@ -94,10 +94,10 @@ app.post('/signin', (req, res) => {
 			})
 			.catch(err => res.status(400).json('unable to get user'))
 		} else {
-		  res.status(400).json('wrong credentials')
+		  res.status(401).json('wrong credentials')
 		}
 	  })
-	  .catch(err => res.status(400).json('wrong credentials'))
+	  .catch(err => res.status(401).json('wrong credentials'))
   })
 
 
