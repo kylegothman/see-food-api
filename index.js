@@ -36,18 +36,17 @@ app.get('/profile/:id', (req, res) => {
     .catch(err => res.status(400).json('user not found'))
 })
 
-// IMAGE RANKINGs
 app.put('/image-ranking', async (req, res) => {
-	try {
-		const { id } = req.body;
-		const updatedScore = await db('users')
-			.where('id', '=', id)
-			.increment('score', 1)
-			.returning('score');
-		res.json(updatedScore[0].score);
-	} catch (error) {
-		res.status(400).json('Unable to get score');
-	}
+    try {
+        const { id, points } = req.body;
+        const updatedScore = await db('users')
+            .where('id', '=', id)
+            .increment('score', points)
+            .returning('score');
+        res.json(updatedScore[0].score);
+    } catch (error) {
+        res.status(400).json('Unable to get score');
+    }
 });
 
 
@@ -81,24 +80,24 @@ app.post('/register', async (req, res) => {
 
 // POST SIGNIN
 app.post('/signin', (req, res) => {
-	const { username, password } = req.body.data;
-	db.select('username', 'hash').from('login')
-	  .where('username', '=', username)
-	  .then(data => {
-		const isValidPassword = bcrypt.compareSync(password, data[0].hash);
-		if (isValidPassword) {
-		  return db.select('*').from('users')
-			.where('username', '=', username)
-			.then(user => {
-			  res.json(user[0])
-			})
-			.catch(err => res.status(400).json('unable to get user'))
-		} else {
-		  res.status(401).json('wrong credentials')
-		}
-	  })
-	  .catch(err => res.status(401).json('wrong credentials'))
-  })
+  const { username, password } = req.body.data;
+  db.select('*').from('login')
+    .where('username', '=', username)
+    .then(data => {
+      const isValidPassword = bcrypt.compareSync(password, data[0].hash);
+      if (isValidPassword) {
+        return db.select('*').from('users')
+          .where('username', '=', username)
+          .then(user => {
+            res.json(user[0]);
+          })
+          .catch(err => res.status(400).json('unable to get user'));
+      } else {
+        res.status(401).json('wrong credentials');
+      }
+    })
+    .catch(err => res.status(401).json('wrong credentials'));
+});
 
 
 
