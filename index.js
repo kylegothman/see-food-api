@@ -5,6 +5,11 @@ const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const knex = require('knex');
+const register = require('./controllers/register');
+const imageBit = require('./controllers/imageBit');
+const signin = require('./controllers/signin');
+const profile = require('./controllers/profile');
+const image = require('./controllers/image');
 
 const db = knex({
   client: 'pg',
@@ -12,7 +17,7 @@ const db = knex({
     host : '127.0.0.1',
     user : '',
     password : '',
-    database : 'see-food-db'
+    database : ''
   }
 });
 
@@ -20,85 +25,33 @@ const db = knex({
 app.use( express.json() );
 app.use( cors() );
 app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '10mb', extended: true}));
+app.use(bodyParser.urlencoded({limit: '10mb', extended: true}));
+
+app.get('/', profile.handleProfileGet(db));
+
+// SIGNOUT
+app.post('/signout', (req, res) => {
+	// Clear the user's session
+	req.session = null;
+	res.status(200).json({ message: 'Signed out successfully' });
+  });
 
 
 // GET - HOMEPAGE
-app.get('/profile/:id', (req, res) => {
-  const { id } = req.params;
-  db.select('*').from('users').where({id})
-    .then(user => {
-      if (user.length) {
-        res.json(user[0])
-      } else {
-        res.status(400).json('Not found')
-      }
-    })
-    .catch(err => res.status(400).json('user not found'))
-})
+app.get('/profile/:id', profile.handleProfileGet(db));
 
-app.put('/image-ranking', async (req, res) => {
-    try {
-        const { id, points } = req.body;
-        const updatedScore = await db('users')
-            .where('id', '=', id)
-            .increment('score', points)
-            .returning('score');
-        res.json(updatedScore[0].score);
-    } catch (error) {
-        res.status(400).json('Unable to get score');
-    }
-});
+// GET - IMAGE RANKING
+app.put('/image-ranking',(req, res) => { image.handleImage(req, res, db) });
 
+// POST - IMAGE BIT
+app.post('/image-bit', (req, res) => { imageBit.handleApiCall(req, res) });
 
 // POST REGISTER
-app.post('/register', async (req, res) => {
-	try {
-		const { name, username, password } = req.body.data;
-		const hash = bcrypt.hashSync(password);
-		const insertedUsername = await db.transaction(async (trx) => {
-			const loginUsername = await trx('login')
-				.insert({
-					hash: hash,
-					username: username,
-				})
-				.returning('username');
-			const user = await trx('users')
-				.insert({
-					username: loginUsername[0].username,
-					name: name,
-					joined: new Date(),
-				})
-				.returning('*');
-			return user[0].username;
-		});
-		res.json(insertedUsername);
-	} catch (error) {
-		res.status(400).json('Unable to register');
-	}
-});
-
+app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt) });
 
 // POST SIGNIN
-app.post('/signin', (req, res) => {
-  const { username, password } = req.body.data;
-  db.select('*').from('login')
-    .where('username', '=', username)
-    .then(data => {
-      const isValidPassword = bcrypt.compareSync(password, data[0].hash);
-      if (isValidPassword) {
-        return db.select('*').from('users')
-          .where('username', '=', username)
-          .then(user => {
-            res.json(user[0]);
-          })
-          .catch(err => res.status(400).json('unable to get user'));
-      } else {
-        res.status(401).json('wrong credentials');
-      }
-    })
-    .catch(err => res.status(401).json('wrong credentials'));
-});
-
+app.post('/signin', signin.handleSignin(db, bcrypt));
 
 
 app.listen(
