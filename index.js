@@ -13,6 +13,12 @@ const profile = require('./controllers/profile');
 const image = require('./controllers/image');
 console.log(DATABASE_URL);
 
+const corsOptions = {
+	origin: 'http://localhost:3000',
+	optionsSuccessStatus: 200,};
+  
+
+
 const db = knex({
 	client: 'pg',
 	connection: {
@@ -22,8 +28,8 @@ const db = knex({
   });
 
 // MIDDLEWARE
+app.use(cors(corsOptions));
 app.use( express.json() );
-app.use( cors() );
 app.use(bodyParser.json());
 
 
