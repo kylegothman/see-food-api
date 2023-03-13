@@ -23,7 +23,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.json({limit: '10mb', extended: true}));
 app.use(bodyParser.urlencoded({limit: '10mb', extended: true}));
 
-app.get('/', profile.handleProfileGet(db));
+
 
 // SIGNOUT
 app.post('/signout', (req, res) => {
