@@ -29,5 +29,5 @@ const handleRegister = async (req, res, db, bcrypt) => {
 };
 
 module.exports = {
-    handleRegister: handleRegister
+    handleRegister,
 }
