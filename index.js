@@ -14,7 +14,7 @@ const image = require('./controllers/image');
 const db = knex({
 	client: 'pg',
 	connection: {
-		connectionString : process.env.DATABASE_URL,
+		connectionString: process.env.DATABASE_URL,
 		ssl: true,
 	},
   });
@@ -23,8 +23,7 @@ const db = knex({
 app.use( express.json() );
 app.use( cors() );
 app.use(bodyParser.json());
-app.use(bodyParser.json({limit: '10mb', extended: true}));
-app.use(bodyParser.urlencoded({limit: '10mb', extended: true}));
+
 
 
 
