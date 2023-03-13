@@ -13,22 +13,26 @@ const profile = require('./controllers/profile');
 const image = require('./controllers/image');
 console.log(DATABASE_URL);
 
-res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-
-const corsOptions = {
+app.use(cors({
 	origin: 'http://localhost:3000',
-	optionsSuccessStatus: 200,};
-  
+	optionsSuccessStatus: 200,
+}));
+app.use( express.json() );
+app.use(bodyParser.json());
 
+app.use(function(req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
 const db = knex({
-	client:'pg',
-	connection: {
-		connectionString: DATABASE_URL,
-		ssl: true,
-	},
-  });
+  client:'pg',
+  connection: {
+    connectionString: DATABASE_URL,
+    ssl: true,
+  },
+});
 
 // MIDDLEWARE
 app.use(cors(corsOptions));
