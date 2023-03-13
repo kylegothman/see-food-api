@@ -13,10 +13,13 @@ const profile = require('./controllers/profile');
 const image = require('./controllers/image');
 console.log(DATABASE_URL);
 
-app.use(cors({
+const corsOptions = {
 	origin: 'http://localhost:3000',
 	optionsSuccessStatus: 200,
-}));
+};
+
+// MIDDLEWARE
+app.use(cors(corsOptions));
 app.use( express.json() );
 app.use(bodyParser.json());
 
