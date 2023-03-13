@@ -13,6 +13,9 @@ const profile = require('./controllers/profile');
 const image = require('./controllers/image');
 console.log(DATABASE_URL);
 
+res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+
 const corsOptions = {
 	origin: 'http://localhost:3000',
 	optionsSuccessStatus: 200,};
@@ -20,7 +23,7 @@ const corsOptions = {
 
 
 const db = knex({
-	client: 'pg',
+	client:'pg',
 	connection: {
 		connectionString: DATABASE_URL,
 		ssl: true,
