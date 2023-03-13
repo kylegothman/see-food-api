@@ -11,6 +11,7 @@ const imageBit = require('./controllers/imageBit');
 const signin = require('./controllers/signin');
 const profile = require('./controllers/profile');
 const image = require('./controllers/image');
+console.log(DATABASE_URL);
 
 const db = knex({
 	client: 'pg',
