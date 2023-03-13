@@ -34,7 +34,7 @@ app.post('/signout', (req, res) => {
 
 
 // GET - HOMEPAGE
-app.get('/', (req, res) => { res.send(database.users) });
+app.get('/', (req, res) => { res.send(db.users) });
 
 // GET - PROFILE
 app.get('/profile/:id', profile.handleProfileGet(db));
