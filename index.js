@@ -1,5 +1,6 @@
 const express = require('express');
 const PORT = process.env.PORT || 3000;
+const DATABASE_URL = process.env.DATABASE_URL;
 const app = express();
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
@@ -14,7 +15,7 @@ const image = require('./controllers/image');
 const db = knex({
 	client: 'pg',
 	connection: {
-		connectionString: process.env.DATABASE_URL,
+		connectionString: DATABASE_URL,
 		ssl: true,
 	},
   });
