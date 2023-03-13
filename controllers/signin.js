@@ -18,7 +18,7 @@ const handleSignin = (db, bcrypt) => (req, res) => {
           res.status(401).json('wrong credentials');
         }
       })
-      .catch(err => res.status(401).json('wrong credentials'));
+      .catch(err => res.status(500).json({ error: 'internal server error'}));
   };
   
 
