@@ -11,6 +11,6 @@ const handleImage =  async (req, res, db) => {
     }
 };
   
-export default {
-    handleImage
-  };
+module.exports = {
+    handleImage: handleImage
+}
