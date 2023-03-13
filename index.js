@@ -1,5 +1,5 @@
 const express = require('express');
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const app = express();
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
@@ -15,9 +15,9 @@ const db = knex({
   client: 'pg',
   connection: {
     host : '127.0.0.1',
-    user : '',
-    password : '',
-    database : ''
+    user : 'kylegothman',
+    password : 'krg343',
+    database : 'see-food-db'
   }
 });
 
@@ -58,6 +58,8 @@ app.listen(
 	PORT,
 	console.log(`it's at alive on http://localhost:${PORT}`)
 	);
+
+
 
 // / --> res == this is working
 // /signin --> POST = success/fail

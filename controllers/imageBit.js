@@ -1,46 +1,48 @@
 
+const { ClarifaiStub, grpc } = require("clarifai-nodejs-grpc");
+
+const stub = ClarifaiStub.grpc();
+
+// This will be used by every Clarifai endpoint call
+const metadata = new grpc.Metadata();
+metadata.set("authorization", "Key c2e851ddbb4446bda9fc93146215a0a8");
+
 const handleApiCall = async (req, res) => {
     // console.log('req.body', req.body.image.content)
-    const raw = JSON.stringify({
-        "user_app_id": {
-        "user_id": ``,
-        "app_id": ``
+
+    stub.PostModelOutputs(
+        {
+            user_app_id: {
+                "user_id": 'k-goth',
+                "app_id": 'SeeFood'
+            },
+            model_id: 'food-item-recognition',
+            inputs: [
+                { data: { image: { base64: req.body.image.content } } }
+            ]
         },
-        "inputs": [
-            {
-                "data": {
-                    "image": {
-                        "base64": req.body.image.content
-                    }
-                }
+        metadata,
+        (err, response) => {
+            if (err) {
+                throw new Error(err);
             }
-        ]
-    });
-
-
-    const requestOptions = {
-        method: 'POST',
-        headers: {
-        'Accept': 'application/json',
-        'Authorization': `Key `,
-        },
-        body: raw
-    };
-    // console.log(requestOptions)
-
-    try {
-        // console.log(requestOptions)
-        const response = await fetch('https://api.clarifai.com/v2/models/food-item-recognition/versions/1d5fd481e0cf4826aa72ec3ff049e044/outputs', requestOptions);
-        const data = await response.json();
-        // console.log(data.outputs[0].data.concepts[0].name);
-        res.json(data);
-        // console.log('response sent', data);
-      } catch (err) {
-        // console.error('Unable to work with API:', err.message);
-        res.status(400).json('Unable to work with API');
-      }
-    };
     
+            if (response.status.code !== 10000) {
+                throw new Error("Post model outputs failed, status: " + response.status.description);
+            }
+    
+            // Since we have one input, one output will exist here
+            // const output = response.outputs[0];
+    
+            // console.log("Predicted concepts:");
+            // for (const concept of output.data.concepts) {
+            //     console.log(concept.name + " " + concept.value);
+            // }
+            res.json(response)
+        }
+    );
+}
+
 module.exports = {
     handleApiCall
 } 

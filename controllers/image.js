@@ -9,9 +9,8 @@ const handleImage =  async (req, res, db) => {
     } catch (error) {
         res.status(400).json('Unable to get score');
     }
-
-    };
+};
   
-  module.exports = {
+export default {
     handleImage
   };
