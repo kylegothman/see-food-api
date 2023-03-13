@@ -12,14 +12,9 @@ const profile = require('./controllers/profile');
 const image = require('./controllers/image');
 
 const db = knex({
-  client: 'pg',
-  connection: {
-    host : '127.0.0.1',
-    user : 'kylegothman',
-    password : 'krg343',
-    database : 'see-food-db'
-  }
-});
+	client: 'pg',
+	connection: process.env.DATABASE_URL,
+  });
 
 // MIDDLEWARE
 app.use( express.json() );
@@ -39,7 +34,7 @@ app.post('/signout', (req, res) => {
 
 
 // GET - HOMEPAGE
-app.get('/profile/:id', profile.handleProfileGet(db));
+app.get('/', (req, res) => { profile.handleProfileGet(req, res, db) });
 
 // GET - IMAGE RANKING
 app.put('/image-ranking',(req, res) => { image.handleImage(req, res, db) });
