@@ -34,7 +34,10 @@ app.post('/signout', (req, res) => {
 
 
 // GET - HOMEPAGE
-app.get('/', (req, res) => { profile.handleProfileGet(req, res, db) });
+app.get('/', (req, res) => { res.send(database.users) });
+
+// GET - PROFILE
+app.get('/profile/:id', profile.handleProfileGet(db));
 
 // GET - IMAGE RANKING
 app.put('/image-ranking',(req, res) => { image.handleImage(req, res, db) });
