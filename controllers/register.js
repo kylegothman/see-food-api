@@ -24,7 +24,7 @@ const handleRegister = async (req, res, db, bcrypt) => {
 		});
 		res.json(insertedUser);
 	} catch (error) {
-		res.status(400).json('Unable to register', error);
+		res.status(500).json({ error: 'Unable to register' });
 	}
 };
 
