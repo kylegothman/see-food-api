@@ -33,9 +33,21 @@ const db = knex({
   client:'pg',
   connection: {
     connectionString: DATABASE_URL,
-    ssl: true,
+    ssl: {
+		rejectUnauthorized: false
+	  }
   },
 });
+
+db.connect();
+
+db.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
+	if (err) throw err;
+	for (let row of res.rows) {
+	  console.log(JSON.stringify(row));
+	}
+	client.end();
+  });
 
 // MIDDLEWARE
 app.use(cors(corsOptions));
