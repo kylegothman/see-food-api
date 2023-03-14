@@ -5,7 +5,7 @@ const stub = ClarifaiStub.grpc();
 
 // This will be used by every Clarifai endpoint call
 const metadata = new grpc.Metadata();
-metadata.set("authorization", "Key c2e851ddbb4446bda9fc93146215a0a8");
+metadata.set("authorization", "Key ");
 
 const handleApiCall = async (req, res) => {
     // console.log('req.body', req.body.image.content)
@@ -13,8 +13,8 @@ const handleApiCall = async (req, res) => {
     stub.PostModelOutputs(
         {
             user_app_id: {
-                "user_id": 'k-goth',
-                "app_id": 'SeeFood'
+                "user_id": '',
+                "app_id": ''
             },
             model_id: 'food-item-recognition',
             inputs: [
